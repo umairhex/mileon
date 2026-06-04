@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary SEO Metadata for Mileon -->
+  <title>Mileon - Set Deadlines, Track Progress</title>
+  <meta name="description" content="Track your important events, project milestones, and personal goals with Mileon, the premium Neobrutalist Countdown Tracker. Responsive layout, dynamic days/hours toggle, and local storage persistence.">
+  <meta name="keywords" content="mileon, countdown timer, deadline tracker, neobrutalist ui, retro timer, event countdown, project planner, local storage countdown, web utilities">
+  <meta name="author" content="Mileon Developer">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mileon - Set Deadlines, Track Progress">
+  <meta property="og:description" content="A premium, self-saving visual countdown system for your projects and goals. Fits perfectly on any screen with customizable days display.">
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'%3E%3Crect width='1200' height='630' fill='%23dfdbff'/%3E%3Ccircle cx='600' cy='315' r='180' fill='%23c3b4fc' stroke='%23000' stroke-width='10'/%3E%3Ctext x='50%25' y='53%25' font-family='sans-serif' font-weight='bold' font-size='72' fill='%23000' text-anchor='middle'%3EMileon ⏳%3C/text%3E%3C/svg%3E">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Mileon - Set Deadlines, Track Progress">
+  <meta property="twitter:description" content="Track your important events and goals with Mileon, the premium self-saving countdown tracker.">
+  
+  <!-- Self-contained Mileon Favicon (Hourglass vector in periwinkle circle) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23c3b4fc' stroke='%23000000' stroke-width='8'/%3E%3Cpath d='M30 30 H70 L53 50 L70 70 H30 L47 50 Z' fill='%23ffb5d8' stroke='%23000000' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <style>
+    /* Design Variables */
+    :root {
+      --bg-base: #dfdbff; /* Soft pastel periwinkle/lilac */
+      --border-color: #000000;
+      --card-bg: #ffffff;
+      
+      /* Neobrutalist Pastels */
+      --pastel-purple: #c3b4fc;
+      --pastel-pink: #ffb5d8;
+      --pastel-green: #a7f3d0;
+      --pastel-yellow: #fef08a;
+      --pastel-blue: #bae6fd;
+      --pastel-coral: #fca5a5;
+      
+      /* Active Accents */
+      --accent-primary: #a78bfa; /* Lavender */
+      --accent-success: #34d399; /* Mint green */
+      --accent-danger: #f87171; /* Coral Red */
+      --accent-dark: #1e1b4b;
+      
+      /* Grid line color for body background */
+      --grid-line: rgba(0, 0, 0, 0.07);
+    }
+
+    /* Core Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Lexend', sans-serif;
+      background-color: var(--bg-base);
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--border-color);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Canvas for Confetti */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Decorative Memphis Background Elements */
+    .memphis-shape {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      filter: drop-shadow(3px 3px 0px var(--border-color));
+    }
+
+    .shape-triangle {
+      top: 8%;
+      right: 12%;
+      width: 40px;
+      height: 40px;
+      animation: float-rotate 12s infinite linear;
+    }
+
+    .shape-circle-blue {
+      top: 15%;
+      right: 8%;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--pastel-blue);
+      border: 3px solid var(--border-color);
+      animation: float-slow 8s infinite ease-in-out;
+    }
+
+    .shape-circle-green {
+      bottom: 12%;
+      left: 6%;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--pastel-green);
+      border: 3px solid var(--border-color);
+      animation: float-slow 9s infinite ease-in-out alternate;
+    }
+
+    .shape-squiggle-left {
+      bottom: 25%;
+      left: 4%;
+      width: 45px;
+      height: 90px;
+      animation: float-slow 11s infinite ease-in-out;
+    }
+
+    .shape-squiggle-right {
+      top: 32%;
+      right: 5%;
+      width: 80px;
+      height: 40px;
+      animation: float-rotate 16s infinite linear;
+    }
+
+    /* Layout Wrapper */
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      z-index: 10;
+    }
+
+    /* Main Title Headers */
+    header {
+      text-align: center;
+    }
+
+    .main-heading {
+      font-size: 1em;
+      font-weight: normal;
+    }
+
+    .title-line {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin: 0.15rem 0;
+      display: block;
+      color: #000;
+      text-shadow: 3px 3px 0px var(--pastel-pink);
+      -webkit-text-stroke: 1.5px var(--border-color);
+    }
+    
+    .title-line:nth-child(2) {
+      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      text-shadow: 3px 3px 0px var(--pastel-yellow);
+    }
+
+    .subtitle {
+      font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+      font-weight: 400;
+      margin-top: 0.5rem;
+      color: var(--accent-dark);
+      opacity: 0.85;
+    }
+
+    /* Primary Hero Countdown Card */
+    .hero-card-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Corner hanging shapes matching mockup */
+    .corner-shape {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-color);
+      z-index: 15;
+    }
+    
+    .corner-pink-square {
+      top: -16px;
+      left: -16px;
+      background-color: var(--pastel-pink);
+      transform: rotate(-8deg);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .corner-blue-cube {
+      bottom: -16px;
+      right: -16px;
+      background-color: var(--pastel-blue);
+      transform: rotate(12deg);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .hero-card {
+      background-color: var(--card-bg);
+      border: 3px solid var(--border-color);
+      box-shadow: 8px 8px 0px 0px var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr 1.25fr;
+    }
+
+    @media (max-width: 850px) {
+      .hero-card {
+        grid-template-columns: 1fr;
+      }
+      .corner-shape {
+        display: none; /* Hide on mobile */
+      }
+    }
+
+    /* Hero Left Panel: Creator Form */
+    .control-panel {
+      padding: 2.25rem 2rem;
+      border-right: 3px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #ffffff;
+      position: relative;
+    }
+
+    @media (max-width: 850px) {
+      .control-panel {
+        border-right: none;
+        border-bottom: 3px solid var(--border-color);
+        padding: 1.75rem 1.5rem;
+      }
+    }
+
+    .panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .inputs-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .date-time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 450px) {
+      .date-time-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+    }
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .input-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* Iconized Custom Input Container */
+    .interactive-input-container {
+      display: flex;
+      align-items: center;
+      border: 3px solid var(--border-color);
+      box-shadow: 3px 3px 0px 0px var(--border-color);
+      border-radius: 4px;
+      background-color: #ffffff;
+      transition: all 0.15s ease;
+      overflow: hidden;
+    }
+
+    .interactive-input-container:focus-within {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px 0px var(--border-color);
+      background-color: #fffdf0;
+    }
+
+    .input-icon {
+      padding: 0.6rem 0.7rem;
+      border-right: 2.5px solid var(--border-color);
+      background-color: var(--pastel-yellow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .interactive-input-container:nth-of-type(1) .input-icon {
+      background-color: var(--pastel-yellow);
+    }
+    
+    .date-time-row .input-wrapper:first-of-type .input-icon {
+      background-color: var(--pastel-pink);
+    }
+    
+    .date-time-row .input-wrapper:last-of-type .input-icon {
+      background-color: var(--pastel-blue);
+    }
+
+    .interactive-input-container input {
+      border: none;
+      outline: none;
+      padding: 0.6rem 0.75rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.9rem;
+      width: 100%;
+      background: transparent;
+      color: var(--border-color);
+    }
+
+    .interactive-input-container input::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Actions and Toast Bar */
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      min-height: 42px;
+    }
+
+    .feedback-message {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.65rem;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      background-color: var(--pastel-green);
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .feedback-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback-message.error {
+      background-color: var(--pastel-coral);
+    }
+
+    /* Buttons Styling */
+    .btn-action {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      padding: 0.65rem 1.5rem;
+      background-color: var(--pastel-purple);
+      border: 3px solid var(--border-color);
+      box-shadow: 4px 4px 0px var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.1s ease-in-out;
+      outline: none;
+    }
+
+    .btn-action:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--border-color);
+    }
+
+    .btn-action:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .btn-reset-style {
+      background-color: var(--pastel-coral);
+    }
+
+    /* Hero Right Panel: Countdown Visualizer */
+    .countdown-panel {
+      display: flex;
+      flex-direction: column;
+      background-color: #fafafa;
+    }
+
+    .active-event-header {
+      background-color: var(--pastel-yellow);
+      border-bottom: 3px solid var(--border-color);
+      padding: 0.75rem 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .countdown-digits-wrapper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* Swaps dynamically via JS */
+      align-items: stretch;
+    }
+
+    .digit-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 3px solid var(--border-color);
+      padding: 2.5rem 1rem;
+      background-color: #ffffff;
+      position: relative;
+    }
+
+    .digit-box:last-of-type {
+      border-right: none;
+    }
+
+    .digit-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+      color: #000;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .digit-val.pop-update {
+      transform: scale(1.15);
+    }
+
+    .digit-lbl {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+    }
+
+    /* Target timestamp footer details and settings bar */
+    .target-footer-bar {
+      border-top: 3px solid var(--border-color);
+      background-color: #f1f5f9;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-settings {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Days Toggle Switch Styling */
+    .days-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .days-toggle-label input {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 2px;
+      background-color: #fff;
+      cursor: pointer;
+      position: relative;
+      outline: none;
+    }
+
+    .days-toggle-label input:checked {
+      background-color: var(--pastel-green);
+    }
+
+    .days-toggle-label input:checked::after {
+      content: "✓";
+      position: absolute;
+      font-size: 9px;
+      font-weight: 900;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .target-timezone-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border: 2px solid var(--border-color);
+      border-radius: 3px;
+      background-color: var(--pastel-pink);
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* Event Completion State Overlay */
+    .completion-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--pastel-yellow);
+      border: none;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      z-index: 20;
+      animation: alert-flash 1s infinite alternate;
+    }
+
+    @keyframes alert-flash {
+      0% { background-color: var(--pastel-yellow); }
+      100% { background-color: var(--pastel-pink); }
+    }
+
+    .completion-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      text-transform: uppercase;
+      color: #000;
+      text-shadow: 2px 2px 0px #fff;
+      -webkit-text-stroke: 1.5px var(--border-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .completion-message {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Responsive Spacing Adaptations */
+    @media (max-width: 500px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+      .digit-box {
+        padding: 1.5rem 0.5rem;
+      }
+      .target-footer-bar {
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Background Decorative Shapes -->
+  <svg class="memphis-shape shape-triangle" viewBox="0 0 50 50">
+    <polygon points="25,5 45,45 5,45" fill="none" stroke="#000000" stroke-width="3" />
+  </svg>
+  <div class="memphis-shape shape-circle-blue"></div>
+  <div class="memphis-shape shape-circle-green"></div>
+  
+  <svg class="memphis-shape shape-squiggle-left" viewBox="0 0 50 100">
+    <path d="M 25,0 C 35,10 35,20 25,30 C 15,40 15,50 25,60 C 35,70 35,80 25,90 C 20,95 20,100 25,100" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+  
+  <svg class="memphis-shape shape-squiggle-right" viewBox="0 0 100 50">
+    <path d="M 0,25 C 10,15 20,15 30,25 C 40,35 50,35 60,25 C 70,15 80,15 90,25 C 95,30 100,30 100,25" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <!-- Semantic HTML5 Main wrapper -->
+  <main class="container">
+    
+    <header>
+      <h1 class="main-heading">
+        <span class="title-line">Mileon</span>
+        <span class="title-line">Track Your Progress.</span>
+      </h1>
+      <p class="subtitle">A premium, self-saving visual countdown system for your projects and goals.</p>
+    </header>
+
+    <!-- Hero Countdown Section -->
+    <div class="hero-card-wrapper">
+      <!-- Decorative hanging corners -->
+      <div class="corner-shape corner-pink-square"></div>
+      <div class="corner-shape corner-blue-cube"></div>
+
+      <div class="hero-card">
+        
+        <!-- Left Side: Creator Form -->
+        <div class="control-panel">
+          
+          <div id="creator-container">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Set Event Details
+            </h2>
+            
+            <form id="deadline-form" onsubmit="saveDeadline(event)" class="inputs-grid">
+              
+              <!-- Event Name Input -->
+              <div class="input-wrapper">
+                <label class="input-label" for="event-name">Event Name</label>
+                <div class="interactive-input-container">
+                  <div class="input-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                  </div>
+                  <input type="text" id="event-name" placeholder="e.g. Project Launch" required maxlength="30">
+                </div>
+              </div>
+
+              <!-- Date & Time Row -->
+              <div class="date-time-row">
+                <!-- Date Picker Input -->
+                <div class="input-wrapper">
+                  <label class="input-label" for="event-date">Target Date</label>
+                  <div class="interactive-input-container">
+                    <div class="input-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </div>
+                    <input type="date" id="event-date" required>
+                  </div>
+                </div>
+
+                <!-- Time Picker Input -->
+                <div class="input-wrapper">
+                  <label class="input-label" for="event-time">Target Time</label>
+                  <div class="interactive-input-container">
+                    <div class="input-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <input type="time" id="event-time" required>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+
+            <div class="form-actions">
+              <span id="feedback-toast" class="feedback-message">Target saved.</span>
+              <div style="display: flex; gap: 0.75rem;">
+                <button type="button" id="btn-reset" class="btn-action btn-reset-style" onclick="resetActiveDeadline()">Reset</button>
+                <button type="submit" form="deadline-form" id="btn-save" class="btn-action">Save</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Real-Time Countdown -->
+        <div class="countdown-panel" style="position: relative;">
+          
+          <!-- Completion overlay -->
+          <div id="completion-overlay" class="completion-overlay">
+            <div class="completion-title">🎉 Time's Up!</div>
+            <p id="completion-event-name" class="completion-message">Your event has successfully occurred.</p>
+            <button id="btn-clear-completed" class="btn-action btn-reset-style" onclick="dismissCompletion()">Clear Completed</button>
+          </div>
+
+          <!-- Active Event Header Display -->
+          <div class="active-event-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="12 2 2 22 22 22"></polygon>
+            </svg>
+            Active Target: <span id="active-event-title" style="margin-left: 0.35rem; font-weight: 700;">No Target Set</span>
+          </div>
+
+          <!-- Countdown Grid Panels (Hides Days dynamically) -->
+          <div id="digits-wrapper" class="countdown-digits-wrapper">
+            <div id="days-box" class="digit-box">
+              <div id="days-val" class="digit-val">00</div>
+              <div class="digit-lbl">Days</div>
+            </div>
+            <div id="hours-box" class="digit-box">
+              <div id="hours-val" class="digit-val">00</div>
+              <div class="digit-lbl">Hours</div>
+            </div>
+            <div id="mins-box" class="digit-box">
+              <div id="mins-val" class="digit-val">00</div>
+              <div class="digit-lbl">Mins</div>
+            </div>
+            <div id="secs-box" class="digit-box">
+              <div id="secs-val" class="digit-val">00</div>
+              <div class="digit-lbl">Secs</div>
+            </div>
+          </div>
+
+          <!-- Footer details & days/timezone settings -->
+          <div class="target-footer-bar">
+            <span id="target-countdown-text">Create a deadline below to start tracking.</span>
+            
+            <div class="footer-settings">
+              <!-- Days toggle switch -->
+              <label class="days-toggle-label" for="days-toggle">
+                <input type="checkbox" id="days-toggle" checked onchange="toggleDaysMetric()">
+                <span>Show Days</span>
+              </label>
+              
+              <span id="timezone-badge" class="target-timezone-badge">GMT</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Countdown Engine & State Script -->
+  <script>
+    // State Variables
+    let activeDeadline = null;
+    let timerInterval = null;
+    let showDays = true;
+
+    // Canvas Confetti Particles
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confettiParticles = [];
+    let isConfettiActive = false;
+    let confettiAnimationId = null;
+
+    // Startup Initializations
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set default timezone badge text
+      const tzOffsetStr = getTimezoneString();
+      document.getElementById('timezone-badge').innerText = tzOffsetStr;
+
+      // Load state from localStorage
+      loadState();
+      
+      // Auto-start clock engine
+      startCountdownEngine();
+    });
+
+    // Compute timezone string
+    function getTimezoneString() {
+      const offsetMinutes = new Date().getTimezoneOffset();
+      const offsetHours = Math.abs(offsetMinutes / 60);
+      const sign = offsetMinutes <= 0 ? '+' : '-';
+      
+      let tzAbbr = '';
+      try {
+        tzAbbr = ' (' + new Intl.DateTimeFormat('en', { timeZoneName: 'short' }).formatToParts(new Date())
+          .find(part => part.type === 'timeZoneName').value + ')';
+      } catch (e) {
+        tzAbbr = '';
+      }
+      
+      return `UTC${sign}${offsetHours}${tzAbbr}`;
+    }
+
+    // Load state
+    function loadState() {
+      const savedDeadline = localStorage.getItem('neobrutalist_deadline');
+      const savedShowDays = localStorage.getItem('neobrutalist_show_days');
+      
+      if (savedShowDays !== null) {
+        showDays = savedShowDays === 'true';
+      } else {
+        showDays = true;
+      }
+      document.getElementById('days-toggle').checked = showDays;
+
+      if (savedDeadline) {
+        try {
+          activeDeadline = JSON.parse(savedDeadline);
+          // Pre-populate input values with saved details
+          document.getElementById('event-name').value = activeDeadline.title;
+          document.getElementById('event-date').value = activeDeadline.dateStr;
+          document.getElementById('event-time').value = activeDeadline.timeStr;
+        } catch (e) {
+          activeDeadline = null;
+          setFormDefaults();
+        }
+      } else {
+        setFormDefaults();
+      }
+
+      applyDaysMetricLayout();
+      updateHeroTimerDisplay();
+    }
+
+    // Configure fallback default form values (tomorrow at 12:00)
+    function setFormDefaults() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const year = tomorrow.getFullYear();
+      const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const day = String(tomorrow.getDate()).padStart(2, '0');
+      
+      document.getElementById('event-name').value = '';
+      document.getElementById('event-date').value = `${year}-${month}-${day}`;
+      document.getElementById('event-time').value = '12:00';
+    }
+
+    // Save state
+    function saveState() {
+      if (activeDeadline) {
+        localStorage.setItem('neobrutalist_deadline', JSON.stringify(activeDeadline));
+      } else {
+        localStorage.removeItem('neobrutalist_deadline');
+      }
+      localStorage.setItem('neobrutalist_show_days', showDays);
+    }
+
+    // Event Handler: Toggle between Days/Hours displays
+    function toggleDaysMetric() {
+      const toggleCheckbox = document.getElementById('days-toggle');
+      showDays = toggleCheckbox.checked;
+      
+      saveState();
+      applyDaysMetricLayout();
+      updateHeroTimerDisplay();
+    }
+
+    // Reconfigure grid layout according to Days Metric preference
+    function applyDaysMetricLayout() {
+      const daysBox = document.getElementById('days-box');
+      const wrapper = document.getElementById('digits-wrapper');
+      
+      if (showDays) {
+        daysBox.style.display = 'flex';
+        wrapper.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      } else {
+        daysBox.style.display = 'none';
+        wrapper.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      }
+    }
+
+    // Event Handler: Save new Target
+    function saveDeadline(event) {
+      event.preventDefault();
+      
+      const titleInput = document.getElementById('event-name');
+      const dateInput = document.getElementById('event-date');
+      const timeInput = document.getElementById('event-time');
+      
+      const title = titleInput.value.trim();
+      const dateVal = dateInput.value;
+      const timeVal = timeInput.value;
+      
+      if (!title || !dateVal || !timeVal) return;
+
+      const targetDate = new Date(`${dateVal}T${timeVal}`);
+      
+      // Validation
+      const now = new Date();
+      if (targetDate.getTime() <= now.getTime()) {
+        showFeedback("Date must be in the future!", true);
+        return;
+      }
+
+      // Store in single active object
+      activeDeadline = {
+        title: title,
+        targetTime: targetDate.getTime(),
+        dateStr: dateVal,
+        timeStr: timeVal
+      };
+
+      showFeedback("Target saved successfully!");
+      saveState();
+      updateHeroTimerDisplay();
+    }
+
+    // Reset current countdown target (restores default form fields)
+    function resetActiveDeadline() {
+      activeDeadline = null;
+      dismissCompletion();
+      setFormDefaults();
+      saveState();
+      updateHeroTimerDisplay();
+      showFeedback("Timer reset.");
+    }
+
+    // Show temporary feedback toast
+    function showFeedback(message, isError = false) {
+      const toast = document.getElementById('feedback-toast');
+      toast.innerText = message;
+      
+      if (isError) {
+        toast.classList.add('error');
+      } else {
+        toast.classList.remove('error');
+      }
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // Format target details display
+    function formatTargetText(timestamp) {
+      const dateObj = new Date(timestamp);
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      const month = months[dateObj.getMonth()];
+      const day = dateObj.getDate();
+      
+      let ordinal = 'th';
+      if (day === 1 || day === 21 || day === 31) ordinal = 'st';
+      else if (day === 2 || day === 22) ordinal = 'nd';
+      else if (day === 3 || day === 23) ordinal = 'rd';
+
+      let hours = dateObj.getHours();
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+
+      const year = dateObj.getFullYear();
+      
+      return `${month} ${day}${ordinal}, ${year} at ${hours}:${minutes} ${ampm}`;
+    }
+
+    // Time calculations
+    function getRemainingTime(endtime) {
+      const total = endtime - Date.now();
+      
+      const seconds = Math.floor((total / 1000) % 60);
+      const minutes = Math.floor((total / 1000 / 60) % 60);
+      const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(total / (1000 * 60 * 60 * 24));
+      
+      return {
+        total,
+        days: Math.max(0, days),
+        hours: Math.max(0, hours),
+        minutes: Math.max(0, minutes),
+        seconds: Math.max(0, seconds)
+      };
+    }
+
+    // Update Hero Timer panels
+    function updateHeroTimerDisplay() {
+      const titleSpan = document.getElementById('active-event-title');
+      const footerSpan = document.getElementById('target-countdown-text');
+      const overlay = document.getElementById('completion-overlay');
+      const resetBtn = document.getElementById('btn-reset');
+
+      if (!activeDeadline) {
+        titleSpan.innerText = "No Target Set";
+        footerSpan.innerText = "Create a deadline below to start tracking.";
+        setDigits(0, 0, 0, 0);
+        overlay.style.display = 'none';
+        resetBtn.style.display = 'none';
+        return;
+      }
+
+      titleSpan.innerText = activeDeadline.title;
+      footerSpan.innerText = `Counting down to: ${formatTargetText(activeDeadline.targetTime)}`;
+      resetBtn.style.display = 'inline-block';
+
+      const remaining = getRemainingTime(activeDeadline.targetTime);
+
+      if (remaining.total <= 0) {
+        // Target reached
+        setDigits(0, 0, 0, 0);
+        document.getElementById('completion-event-name').innerText = `"${activeDeadline.title}" has successfully reached its deadline!`;
+        overlay.style.display = 'flex';
+        startConfetti();
+      } else {
+        // Active
+        setDigits(remaining.days, remaining.hours, remaining.minutes, remaining.seconds, remaining.total);
+        overlay.style.display = 'none';
+      }
+    }
+
+    // Update digit output
+    function setDigits(d, h, m, s, totalMs) {
+      const daysValEl = document.getElementById('days-val');
+      const hoursValEl = document.getElementById('hours-val');
+      const minsValEl = document.getElementById('mins-val');
+      const secsValEl = document.getElementById('secs-val');
+
+      const formatNum = val => String(val).padStart(2, '0');
+
+      if (showDays) {
+        updateDigitElement(daysValEl, formatNum(d));
+        updateDigitElement(hoursValEl, formatNum(h));
+      } else {
+        let totalHours = 0;
+        if (totalMs && totalMs > 0) {
+          totalHours = Math.floor(totalMs / (1000 * 60 * 60));
+        }
+        updateDigitElement(hoursValEl, formatNum(totalHours));
+      }
+
+      updateDigitElement(minsValEl, formatNum(m));
+      updateDigitElement(secsValEl, formatNum(s));
+    }
+
+    // Triggers digit scale pops on change
+    function updateDigitElement(el, newVal) {
+      if (el.innerText !== newVal) {
+        el.innerText = newVal;
+        el.classList.add('pop-update');
+        setTimeout(() => {
+          el.classList.remove('pop-update');
+        }, 220);
+      }
+    }
+
+    // Timer loop updater
+    function startCountdownEngine() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateHeroTimerDisplay, 1000);
+    }
+
+    // Dismiss overlay and clear state
+    function dismissCompletion() {
+      document.getElementById('completion-overlay').style.display = 'none';
+      stopConfetti();
+      
+      activeDeadline = null;
+      setFormDefaults();
+      saveState();
+      updateHeroTimerDisplay();
+    }
+
+    // ==========================================
+    // CONFETTI PARTICLE SYSTEM
+    // ==========================================
+    function startConfetti() {
+      if (isConfettiActive) return;
+      isConfettiActive = true;
+      confettiParticles = [];
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      const colors = ['#a78bfa', '#ffb5d8', '#fef08a', '#bae6fd', '#34d399', '#f87171'];
+      for (let i = 0; i < 110; i++) {
+        confettiParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 3 + 2,
+          speedX: Math.random() * 4 - 2,
+          rotation: Math.random() * 360,
+          rotationSpeed: Math.random() * 4 - 2
+        });
+      }
+
+      runConfettiLoop();
+    }
+
+    function stopConfetti() {
+      isConfettiActive = false;
+      if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      window.removeEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function runConfettiLoop() {
+      if (!isConfettiActive) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      confettiParticles.forEach(p => {
+        p.y += p.speedY;
+        p.x += p.speedX;
+        p.rotation += p.rotationSpeed;
+
+        if (p.x > canvas.width) p.x = 0;
+        else if (p.x < 0) p.x = canvas.width;
+
+        ctx.save();
+        ctx.translate(p.x + p.size/2, p.y + p.size/2);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5;
+        
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        ctx.strokeRect(-p.size/2, -p.size/2, p.size, p.size);
+        ctx.restore();
+
+        if (p.y > canvas.height) {
+          p.y = -20;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+
+      confettiAnimationId = requestAnimationFrame(runConfettiLoop);
+    }
+  </script>
+</body>
+</html>

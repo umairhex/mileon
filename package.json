@@ -1,0 +1,14 @@
+{
+  "name": "neobrutalist-countdown-tracker",
+  "version": "1.0.0",
+  "description": "Premium Neobrutalist Countdown Tracker with local persistence",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server ./",
+    "dev": "npx http-server ./"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
